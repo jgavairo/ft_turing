@@ -1,0 +1,114 @@
+FT_TURING — HANDOFF SESSION (March 10, 2026)
+
+Contexte
+- Projet: ft_turing
+- Objectif: accompagner (pédagogie) pour apprendre OCaml et implémenter le projet sans faire le projet à la place.
+- Sujet lu depuis en.subject.pdf.
+
+Rappel des exigences sujet (mandatory)
+- Simuler une machine de Turing à 1 ruban infini, 1 tête.
+- Entrées CLI: jsonfile + input, avec --help.
+- Parser description machine JSON.
+- Rejeter JSON invalides/mal formés + input invalides avec message clair (pas de crash).
+- Afficher au minimum l’état du ruban + tête + transition à chaque pas.
+- Détecter machine bloquée (pas de transition applicable hors état final).
+- Fournir 5 descriptions de machines (addition unaire, palindrome, 0^n1^n, 0^(2n), machine qui exécute la machine d’addition encodée).
+
+Répartition de travail proposée (50/50)
+- Partie A (débutant-friendly): types, parsing JSON, validation, CLI.
+- Partie B: moteur d’exécution (ruban/tête, step, boucle, affichage, blocage).
+- Commun: interface de types partagée + intégration + tests + 5 machines JSON.
+
+Étape 1 (faite): bases OCaml + types + helpers
+
+1) Types créés dans src/types.ml
+- action = Left | Right
+- transition = {
+    current_state: string;
+    read: char;
+    replace_by: char;
+    to_state: string;
+    action: action;
+  }
+- machine = {
+    machine_name: string;
+    initial_state: string;
+    states: string list;
+    alphabet: char list;
+    blank: char;
+    transitions: transition list;
+    final_states: string list;
+  }
+
+2) Helpers créés dans src/helpers.ml
+- open Types
+- char_of_string : string -> (char, string) result
+  - Ok c si longueur 1
+  - Error "..." sinon
+- is_final_state : machine -> string -> bool
+  - teste si current_state ∈ machine.final_states
+- find_transition_for_this_char : machine -> string -> char -> transition option
+  - cherche transition où
+    t.current_state = current_state && t.read = current_char
+
+3) Mini test dans src/main.ml
+- Construction d’une machine de démo + transitions codées en dur.
+- Appels test:
+  - char_of_string "a"
+  - is_final_state m "HALT"
+  - is_final_state m "scanright"
+  - find_transition_for_this_char m "scanright" '='
+
+Compilation et exécution validées
+- Commande de compilation qui marche:
+  ocamlc -I src -o ft_turing src/types.ml src/helpers.ml src/main.ml
+- Exécution:
+  ./ft_turing
+- Sortie observée:
+  char_of_string("a") = a
+  is_final_state HALT = true
+  is_final_state scanright = false
+  transition found: scanright --=--> eraseone
+
+Note importante rencontrée
+- Erreur "Unbound module Types" résolue avec l’option -I src.
+- Éviter de coller des liens markdown dans les commandes shell.
+
+Prochaine étape (à faire): Étape 2 parsing JSON
+Objectif: obtenir
+- parse_machine_file : string -> (Types.machine, string) result
+
+Ordre conseillé
+1. Créer src/parser.ml
+2. Lire le fichier JSON
+3. Parser JSON (ex: yojson)
+4. Extraire champs vers Types.machine
+5. Convertir/valider les symboles string(1) -> char via char_of_string
+6. Retourner Error message explicite sur toute anomalie
+
+Checklist de validation JSON à implémenter ensuite
+- Champs requis présents.
+- alphabet: chaînes de longueur 1.
+- blank ∈ alphabet.
+- initial_state ∈ states.
+- final_states ⊆ states.
+- transitions:
+  - états source existants,
+  - read/write ∈ alphabet,
+  - to_state ∈ states,
+  - action ∈ {LEFT, RIGHT}.
+- input utilisateur: tous chars dans alphabet ET pas de blank.
+
+Fichiers existants actuellement
+- src/types.ml
+- src/helpers.ml
+- src/main.ml
+- en.subject.pdf
+
+Résumé pédagogique transmis pendant la session
+- match ≈ switch mais plus puissant (pattern matching structurel).
+- blank = symbole vide du ruban infini.
+- Utiliser result pour erreurs de parsing/validation.
+- Séparer clairement paramètres machine vs état courant.
+
+Fin du handoff.
