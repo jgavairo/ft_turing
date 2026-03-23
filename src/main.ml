@@ -24,21 +24,30 @@ let () =
     else if not (can_open_file jsonfile_path) then
       Printf.printf "Error: Cannot open file %s\n" jsonfile_path
     else
-      Printf.printf "jsonfile=%s input=%s\n" jsonfile_path input
-
-  (* let machine_name = "unary_sub" in
-  let path = "machines/" ^ machine_name ^ ".json" in
-  let json = Yojson.Safe.from_file path in
-  let name = get_value "name" (Yojson.Safe.Util.to_assoc json) |> Result.get_ok |> Yojson.Safe.Util.to_string in
-  let alphabet = get_value "alphabet" (Yojson.Safe.Util.to_assoc json) |> Result.get_ok |> Yojson.Safe.Util.to_list |> List.map Yojson.Safe.Util.to_string in
-  let blank = get_value "blank" (Yojson.Safe.Util.to_assoc json) |> Result.get_ok |> Yojson.Safe.Util.to_string in
-  let states = get_value "states" (Yojson.Safe.Util.to_assoc json) |> Result.get_ok |> Yojson.Safe.Util.to_list |> List.map Yojson.Safe.Util.to_string in
-  let initial_state = get_value "initial" (Yojson.Safe.Util.to_assoc json) |> Result.get_ok |> Yojson.Safe.Util.to_string in
-  let final_states = get_value "finals" (Yojson.Safe.Util.to_assoc json) |> Result.get_ok |> Yojson.Safe.Util.to_list |> List.map Yojson.Safe.Util.to_string in
-  Printf.printf "Machine name: %s\n" name;
-  Printf.printf "Alphabet: %s\n" (String.concat ", " alphabet);
-  Printf.printf "Blank symbol: %s\n" blank;
-  Printf.printf "States: %s\n" (String.concat ", " states);
-  Printf.printf "Initial state: %s\n" initial_state;
-  Printf.printf "Final states: %s\n" (String.concat ", " final_states); *)
+      match get_machine_settings jsonfile_path with
+      | Error msg ->
+          Printf.printf "Error: %s\n" msg
+      | Ok machine ->
+          let alphabet = List.map (String.make 1) machine.alphabet in
+          let action_to_string = function
+            | Left -> "LEFT"
+            | Right -> "RIGHT"
+          in
+          Printf.printf "jsonfile=%s input=%s\n" jsonfile_path input;
+          Printf.printf "Machine name: %s\n" machine.machine_name;
+          Printf.printf "Alphabet: %s\n" (String.concat ", " alphabet);
+          Printf.printf "Blank symbol: %c\n" machine.blank;
+          Printf.printf "States: %s\n" (String.concat ", " machine.states);
+          Printf.printf "Initial state: %s\n" machine.initial_state;
+          Printf.printf "Final states: %s\n" (String.concat ", " machine.final_states);
+          Printf.printf "Transitions (%d):\n" (List.length machine.transitions);
+          List.iter
+            (fun t ->
+              Printf.printf "(%s, %c) -> (%s, %c, %s)\n"
+                t.current_state
+                t.read
+                t.to_state
+                t.replace_by
+                (action_to_string t.action))
+            machine.transitions
 
