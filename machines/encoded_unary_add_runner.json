@@ -1,0 +1,41 @@
+{
+    "name" : "encoded_unary_add_runner",
+    "alphabet": [ "1", "+", "=", "|", "a", "s", "t", "i", "f", "." ],
+    "blank" : ".",
+    "states" : [ "skipdesc", "findplus", "readright", "fillgap", "clearold", "HALT" ],
+    "initial" : "skipdesc",
+    "finals" : [ "HALT" ],
+    "transitions" :
+    {
+        "skipdesc":
+        [
+            { "read" : "a", "to_state": "skipdesc", "write": "a", "action": "RIGHT"},
+            { "read" : "s", "to_state": "skipdesc", "write": "s", "action": "RIGHT"},
+            { "read" : "t", "to_state": "skipdesc", "write": "t", "action": "RIGHT"},
+            { "read" : "i", "to_state": "skipdesc", "write": "i", "action": "RIGHT"},
+            { "read" : "f", "to_state": "skipdesc", "write": "f", "action": "RIGHT"},
+            { "read" : "1", "to_state": "skipdesc", "write": "1", "action": "RIGHT"},
+            { "read" : "+", "to_state": "skipdesc", "write": "+", "action": "RIGHT"},
+            { "read" : "=", "to_state": "skipdesc", "write": "=", "action": "RIGHT"},
+            { "read" : "|", "to_state": "findplus", "write": ".", "action": "RIGHT"}
+        ],
+        "findplus":
+        [
+            { "read" : "1", "to_state": "findplus", "write": "1", "action": "RIGHT"},
+            { "read" : "+", "to_state": "readright", "write": ".", "action": "RIGHT"}
+        ],
+        "readright":
+        [
+            { "read" : "1", "to_state": "fillgap", "write": "1", "action": "LEFT"},
+            { "read" : "=", "to_state": "HALT", "write": ".", "action": "LEFT"}
+        ],
+        "fillgap":
+        [
+            { "read" : ".", "to_state": "clearold", "write": "1", "action": "RIGHT"}
+        ],
+        "clearold":
+        [
+            { "read" : "1", "to_state": "readright", "write": ".", "action": "RIGHT"}
+        ]
+    }
+}

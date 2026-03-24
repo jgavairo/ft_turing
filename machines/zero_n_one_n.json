@@ -1,0 +1,71 @@
+{
+    "name" : "zero_n_one_n",
+    "alphabet": [ "0", "1", "X", "Y", "y", "n", "." ],
+    "blank" : ".",
+    "states" : [ "start", "seekrightend", "findoneback", "returnleft", "checkdone", "seekendy", "seekendn", "HALT" ],
+    "initial" : "start",
+    "finals" : [ "HALT" ],
+    "transitions" :
+    {
+        "start":
+        [
+            { "read" : "X", "to_state": "start", "write": "X", "action": "RIGHT"},
+            { "read" : "0", "to_state": "seekrightend", "write": "X", "action": "RIGHT"},
+            { "read" : "Y", "to_state": "checkdone", "write": "Y", "action": "RIGHT"},
+            { "read" : "1", "to_state": "seekendn", "write": "1", "action": "RIGHT"},
+            { "read" : ".", "to_state": "seekendy", "write": ".", "action": "RIGHT"}
+        ],
+        "seekrightend":
+        [
+            { "read" : "0", "to_state": "seekrightend", "write": "0", "action": "RIGHT"},
+            { "read" : "1", "to_state": "seekrightend", "write": "1", "action": "RIGHT"},
+            { "read" : "X", "to_state": "seekrightend", "write": "X", "action": "RIGHT"},
+            { "read" : "Y", "to_state": "seekrightend", "write": "Y", "action": "RIGHT"},
+            { "read" : ".", "to_state": "findoneback", "write": ".", "action": "LEFT"}
+        ],
+        "findoneback":
+        [
+            { "read" : "Y", "to_state": "findoneback", "write": "Y", "action": "LEFT"},
+            { "read" : "1", "to_state": "returnleft", "write": "Y", "action": "LEFT"},
+            { "read" : "0", "to_state": "seekendn", "write": "0", "action": "RIGHT"},
+            { "read" : "X", "to_state": "seekendn", "write": "X", "action": "RIGHT"},
+            { "read" : ".", "to_state": "seekendn", "write": ".", "action": "RIGHT"}
+        ],
+        "returnleft":
+        [
+            { "read" : "0", "to_state": "returnleft", "write": "0", "action": "LEFT"},
+            { "read" : "1", "to_state": "returnleft", "write": "1", "action": "LEFT"},
+            { "read" : "X", "to_state": "returnleft", "write": "X", "action": "LEFT"},
+            { "read" : "Y", "to_state": "returnleft", "write": "Y", "action": "LEFT"},
+            { "read" : ".", "to_state": "start", "write": ".", "action": "RIGHT"}
+        ],
+        "checkdone":
+        [
+            { "read" : "Y", "to_state": "checkdone", "write": "Y", "action": "RIGHT"},
+            { "read" : "0", "to_state": "seekendn", "write": "0", "action": "RIGHT"},
+            { "read" : "1", "to_state": "seekendn", "write": "1", "action": "RIGHT"},
+            { "read" : "X", "to_state": "seekendn", "write": "X", "action": "RIGHT"},
+            { "read" : ".", "to_state": "seekendy", "write": ".", "action": "RIGHT"}
+        ],
+        "seekendy":
+        [
+            { "read" : "0", "to_state": "seekendy", "write": "0", "action": "RIGHT"},
+            { "read" : "1", "to_state": "seekendy", "write": "1", "action": "RIGHT"},
+            { "read" : "X", "to_state": "seekendy", "write": "X", "action": "RIGHT"},
+            { "read" : "Y", "to_state": "seekendy", "write": "Y", "action": "RIGHT"},
+            { "read" : "y", "to_state": "seekendy", "write": "y", "action": "RIGHT"},
+            { "read" : "n", "to_state": "seekendy", "write": "n", "action": "RIGHT"},
+            { "read" : ".", "to_state": "HALT", "write": "y", "action": "RIGHT"}
+        ],
+        "seekendn":
+        [
+            { "read" : "0", "to_state": "seekendn", "write": "0", "action": "RIGHT"},
+            { "read" : "1", "to_state": "seekendn", "write": "1", "action": "RIGHT"},
+            { "read" : "X", "to_state": "seekendn", "write": "X", "action": "RIGHT"},
+            { "read" : "Y", "to_state": "seekendn", "write": "Y", "action": "RIGHT"},
+            { "read" : "y", "to_state": "seekendn", "write": "y", "action": "RIGHT"},
+            { "read" : "n", "to_state": "seekendn", "write": "n", "action": "RIGHT"},
+            { "read" : ".", "to_state": "HALT", "write": "n", "action": "RIGHT"}
+        ]
+    }
+}
