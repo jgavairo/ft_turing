@@ -70,7 +70,7 @@ let print_config machine config =
   let left_visible = List.rev config.left in
   let right_padding = List.init 10 (fun _ -> machine.blank) in
   let right_visible = config.right @ right_padding in
-  Printf.printf "[%s<%c>%s]\n"
+  Printf.printf "[%s<%c>%s] "
     (chars_to_string left_visible)
     config.head
     (chars_to_string right_visible)
