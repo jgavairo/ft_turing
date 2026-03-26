@@ -107,11 +107,8 @@ let validate_zero_n_one_n_format input =
   in
   let zero_count = scan_zeros 0 in
   let one_end = scan_ones zero_count in
-  let one_count = one_end - zero_count in
   if one_end <> len then
     Error "Invalid input: zero_n_one_n expects format 0*1*"
-  else if zero_count <> one_count then
-    Error "Invalid input: zero_n_one_n expects |0| = |1|"
   else
     Ok ()
 

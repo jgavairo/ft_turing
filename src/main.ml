@@ -49,10 +49,17 @@ let () =
             | Error msg ->
                 Printf.printf "Error: %s\n" msg
             | Ok config ->
-                Printf.printf "jsonfile=%s input=%s\n" jsonfile_path input;
-                Printf.printf "Machine name: %s\n" machine.machine_name;
+                let sep = String.make 80 '*' in
+                Printf.printf "%s\n" sep;
+                Printf.printf "*%s*\n" (String.make 78 ' ');
+                Printf.printf "*%s%s%s*\n" 
+                  (String.make ((78 - String.length machine.machine_name) / 2) ' ')
+                  machine.machine_name
+                  (String.make ((78 - String.length machine.machine_name + 1) / 2) ' ');
+                Printf.printf "*%s*\n" (String.make 78 ' ');
+                Printf.printf "%s\n" sep;
+                Printf.printf "\n";
                 Printf.printf "Alphabet: %s\n" (String.concat ", " alphabet);
-                Printf.printf "Blank symbol: %c\n" machine.blank;
                 Printf.printf "States: %s\n" (String.concat ", " machine.states);
                 Printf.printf "Initial state: %s\n" machine.initial_state;
                 Printf.printf "Final states: %s\n" (String.concat ", " machine.final_states);
@@ -66,11 +73,11 @@ let () =
                       t.replace_by
                       (action_to_string t.action))
                   machine.transitions;
-                Printf.printf "Initial config: state=%s head=%c left=%d right=%d\n"
-                  config.state
-                  config.head
-                  (List.length config.left)
-                  (List.length config.right);
+                Printf.printf "\n";
+                Printf.printf "%s\n" sep;
+                Printf.printf "Execution with input: \"%s\"\n" input;
+                Printf.printf "%s\n" sep;
+                Printf.printf "\n";
                 run machine config
           end
 
