@@ -121,19 +121,6 @@ let validate_zero_2n_format input =
   else
     Ok ()
 
-let validate_encoded_unary_add_runner_format input =
-  let pipe_count = count_char_in_string input '|' in
-  if pipe_count <> 1 then
-    Error "Invalid input: encoded_unary_add_runner expects exactly one '|' separator"
-  else
-    let pipe_idx = String.index input '|' in
-    if pipe_idx = String.length input - 1 then
-      Error "Invalid input: encoded_unary_add_runner expects unary_add input after '|'"
-    else
-      let expr_len = String.length input - pipe_idx - 1 in
-      let expr = String.sub input (pipe_idx + 1) expr_len in
-      validate_unary_add_format expr
-
 let validate_input_format machine input =
   match machine.machine_name with
   | "unary_sub" -> validate_unary_sub_format input
@@ -141,7 +128,6 @@ let validate_input_format machine input =
   | "palindrome" -> validate_palindrome_format input
   | "zero_n_one_n" -> validate_zero_n_one_n_format input
   | "zero_2n" -> validate_zero_2n_format input
-  | "encoded_unary_add_runner" -> validate_encoded_unary_add_runner_format input
   | _ -> Ok ()
 
 let print_config machine config =
