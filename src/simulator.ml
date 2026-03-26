@@ -34,37 +34,118 @@ let validate_input machine input_chars =
   in
   loop input_chars
 
-let validate_input_format machine input =
-  if machine.machine_name <> "unary_sub" then
+let count_char_in_string input ch =
+  let len = String.length input in
+  let rec aux i acc =
+    if i >= len then acc
+    else if input.[i] = ch then aux (i + 1) (acc + 1)
+    else aux (i + 1) acc
+  in
+  aux 0 0
+
+let all_chars_match input predicate =
+  let len = String.length input in
+  let rec aux i =
+    if i >= len then true
+    else if predicate input.[i] then aux (i + 1)
+    else false
+  in
+  aux 0
+
+let validate_unary_sub_format input =
+  let len = String.length input in
+  let minus_count = count_char_in_string input '-' in
+  let equal_count = count_char_in_string input '=' in
+  if minus_count <> 1 || equal_count <> 1 then
+    Error "Invalid input: unary_sub expects exactly one '-' and one '='"
+  else if len = 0 || input.[len - 1] <> '=' then
+    Error "Invalid input: unary_sub input must end with '='"
+  else
+    let minus_idx = String.index input '-' in
+    let equal_idx = String.index input '=' in
+    if minus_idx = 0 || equal_idx <= minus_idx + 1 then
+      Error "Invalid input: unary_sub expects format 1+-1+="
+    else
+      let left_count = minus_idx in
+      let right_count = equal_idx - minus_idx - 1 in
+      if left_count < right_count then
+        Error "Invalid input: unary_sub requires left unary number >= right unary number"
+      else
+        Ok ()
+
+let validate_unary_add_format input =
+  let len = String.length input in
+  let plus_count = count_char_in_string input '+' in
+  let equal_count = count_char_in_string input '=' in
+  if plus_count <> 1 || equal_count <> 1 then
+    Error "Invalid input: unary_add expects exactly one '+' and one '='"
+  else if len = 0 || input.[len - 1] <> '=' then
+    Error "Invalid input: unary_add input must end with '='"
+  else
+    let plus_idx = String.index input '+' in
+    let equal_idx = String.index input '=' in
+    if plus_idx = 0 || equal_idx <= plus_idx + 1 then
+      Error "Invalid input: unary_add expects format 1++1+="
+    else
+      Ok ()
+
+let validate_palindrome_format input =
+  if all_chars_match input (fun c -> c = '0' || c = '1') then
     Ok ()
   else
-    let len = String.length input in
-    let count_char ch =
-      let rec aux i acc =
-        if i >= len then acc
-        else if input.[i] = ch then aux (i + 1) (acc + 1)
-        else aux (i + 1) acc
-      in
-      aux 0 0
-    in
-    let minus_count = count_char '-' in
-    let equal_count = count_char '=' in
-    if minus_count <> 1 || equal_count <> 1 then
-      Error "Invalid input: unary_sub expects exactly one '-' and one '='"
-    else if input.[len - 1] <> '=' then
-      Error "Invalid input: unary_sub input must end with '='"
+    Error "Invalid input: palindrome expects only '0' and '1'"
+
+let validate_zero_n_one_n_format input =
+  let len = String.length input in
+  let rec scan_zeros i =
+    if i < len && input.[i] = '0' then scan_zeros (i + 1)
+    else i
+  in
+  let rec scan_ones i =
+    if i < len && input.[i] = '1' then scan_ones (i + 1)
+    else i
+  in
+  let zero_count = scan_zeros 0 in
+  let one_end = scan_ones zero_count in
+  let one_count = one_end - zero_count in
+  if one_end <> len then
+    Error "Invalid input: zero_n_one_n expects format 0*1*"
+  else if zero_count <> one_count then
+    Error "Invalid input: zero_n_one_n expects |0| = |1|"
+  else
+    Ok ()
+
+let validate_zero_2n_format input =
+  let len = String.length input in
+  if not (all_chars_match input (fun c -> c = '0')) then
+    Error "Invalid input: zero_2n expects only '0'"
+  else if len mod 2 <> 0 then
+    Error "Invalid input: zero_2n expects an even number of '0'"
+  else
+    Ok ()
+
+let validate_encoded_unary_add_runner_format input =
+  let pipe_count = count_char_in_string input '|' in
+  if pipe_count <> 1 then
+    Error "Invalid input: encoded_unary_add_runner expects exactly one '|' separator"
+  else
+    let pipe_idx = String.index input '|' in
+    if pipe_idx = String.length input - 1 then
+      Error "Invalid input: encoded_unary_add_runner expects unary_add input after '|'"
     else
-      let minus_idx = String.index input '-' in
-      let equal_idx = String.index input '=' in
-      if minus_idx = 0 || equal_idx <= minus_idx + 1 then
-        Error "Invalid input: unary_sub expects format 1+-1+="
-      else
-        let left_count = minus_idx in
-        let right_count = equal_idx - minus_idx - 1 in
-        if left_count < right_count then
-          Error "Invalid input: unary_sub requires left unary number >= right unary number"
-        else
-          Ok ()
+      let expr_len = String.length input - pipe_idx - 1 in
+      let expr = String.sub input (pipe_idx + 1) expr_len in
+      validate_unary_add_format expr
+
+let validate_input_format machine input =
+  match machine.machine_name with
+  | "unary_sub" -> validate_unary_sub_format input
+  | "unary_add" -> validate_unary_add_format input
+  | "palindrome" -> validate_palindrome_format input
+  | "zero_n_one_n" -> validate_zero_n_one_n_format input
+  | "zero_2n" -> validate_zero_2n_format input
+  | "encoded_unary_add_runner" -> validate_encoded_unary_add_runner_format input
+  | _ -> Ok ()
 
 let print_config machine config =
   let left_visible = List.rev config.left in

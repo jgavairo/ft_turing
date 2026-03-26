@@ -6,6 +6,14 @@ open Simulator
 let has_json_extension path =
       Filename.check_suffix path ".json"
 
+let print_help () =
+  Printf.printf "usage: ft_turing [-h] jsonfile input\n";
+  Printf.printf "positional arguments:\n";
+  Printf.printf "jsonfile json description of the machine\n";
+  Printf.printf "input input of the machine\n";
+  Printf.printf "optional arguments:\n";
+  Printf.printf "-h, --help show this help message and exit\n"
+
 let can_open_file path = 
   try
     let ic = open_in_bin path in
@@ -14,8 +22,10 @@ let can_open_file path =
   with _ -> false
 
 let () =
-  if Array.length Sys.argv <> 3 then
-    Printf.printf "usage: ft_turing jsonfile input\n"
+  if Array.length Sys.argv = 2 && (Sys.argv.(1) = "-h" || Sys.argv.(1) = "--help") then
+    print_help ()
+  else if Array.length Sys.argv <> 3 then
+    Printf.printf "usage: ft_turing [-h] jsonfile input\n"
   else
     let jsonfile_path = Sys.argv.(1) in
     let input = Sys.argv.(2) in
